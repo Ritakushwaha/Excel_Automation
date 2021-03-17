@@ -29,8 +29,8 @@ worksheet.write('K1', 'Project', cf)
 
 tickets = ['','0','CHG0056957','CHG0056935','SCTASK0081896','INC0666400','SCTASK0083834','CHG0056957','INC0662672','INC0667274','INC0667610']
 l = len(tickets)-1
-corp_id = 'rikushwa'
-project = 'TOPSI'
+corp_id = '######'
+project = '######'
 complexity = 'Medium'
 activity_type = ''
 activity = ''
