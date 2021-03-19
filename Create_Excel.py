@@ -1,12 +1,12 @@
 # https://xlsxwriter.readthedocs.io/contents.html
 
 import xlsxwriter
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Create a workbook and add a worksheet.
 month = datetime.today().month
 year = datetime.today().year
-dt = str(datetime.today()).split()[0]
+dt = str(datetime.today()-timedelta(days = 1)).split()[0]
 
 workbook = xlsxwriter.Workbook(f'Efforts_{month}_{year}.xlsx')
 worksheet = workbook.add_worksheet(f'data_{dt}.xlsx')
@@ -26,6 +26,8 @@ worksheet.write('H1', 'Complexity', cf)
 worksheet.write('I1', 'AMorAD', cf)
 worksheet.write('J1', 'SOW', cf)
 worksheet.write('K1', 'Project', cf)
+
+
 
 tickets = ['','0','CHG0000000','CHG1111111','SCT1232121','INC1121212','SCT121221','CHG121212','INC1212122','INC1212122','INC121212']
 l = len(tickets)-1
