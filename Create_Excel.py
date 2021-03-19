@@ -6,13 +6,13 @@ from datetime import datetime, timedelta
 # Create a workbook and add a worksheet.
 month = datetime.today().month
 year = datetime.today().year
-dt = str(datetime.today()-timedelta(days = 1)).split()[0]
+dt = str(datetime.today() - timedelta(days=1)).split()[0]
 
-workbook = xlsxwriter.Workbook(f'Efforts_{month}_{year}.xlsx')
-worksheet = workbook.add_worksheet(f'data_{dt}.xlsx')
+workbook = xlsxwriter.Workbook(f'Efforts_{dt}.xlsx')
+worksheet = workbook.add_worksheet(f'Data_{dt}.xlsx')
 
 # Add a bold format to use to highlight cells.
-cf = workbook.add_format({'bg_color': 'yellow'})
+cf = workbook.add_format({'bg_color' : 'yellow'})
 
 # Write some data headers.
 worksheet.write('A1', 'Ticket No', cf)
@@ -27,12 +27,12 @@ worksheet.write('I1', 'AMorAD', cf)
 worksheet.write('J1', 'SOW', cf)
 worksheet.write('K1', 'Project', cf)
 
+tickets = ['', '0', 'CHG0000000', 'CHG1111111', 'SCT1232121', 'INC1121212', 'SCT121221', 'CHG121212', 'INC1212122',
+           'INC1212122', 'INC121212']
 
-
-tickets = ['','0','CHG0000000','CHG1111111','SCT1232121','INC1121212','SCT121221','CHG121212','INC1212122','INC1212122','INC121212']
-l = len(tickets)-1
-corp_id = '######'
-project = '######'
+l = len(tickets) - 1
+corp_id = 'rikushwa'
+project = 'TOPSI'
 complexity = 'Medium'
 activity_type = ''
 activity = ''
@@ -40,7 +40,7 @@ reference = ''
 effort = 0
 AMorAD = ''
 SOW = ''
-date_format = workbook.add_format({'num_format':'yyyy-mm-dd hh:mm:ss'})
+date_format = workbook.add_format({'num_format' : 'yyyy-mm-dd hh:mm:ss'})
 
 # Start from the first cell below the headers.
 row = 1
@@ -65,7 +65,8 @@ for ticket in tickets:
         activity = 'Incident'
         effort = 0.75
 
-    ticket_details = ([ticket, reference, corp_id, activity_type, activity, dt, effort, complexity, AMorAD, SOW, project],)
+    ticket_details = (
+        [ticket, reference, corp_id, activity_type, activity, dt, effort, complexity, AMorAD, SOW, project],)
 
     for tickets, reference, corp_id, activity_type, activity, date, effort, complexity, AMorAD, SOW, project in ticket_details :
         worksheet.write(row, col, tickets)
@@ -73,7 +74,7 @@ for ticket in tickets:
         worksheet.write(row, col + 2, corp_id)
         worksheet.write(row, col + 3, activity_type)
         worksheet.write(row, col + 4, activity)
-        worksheet.write(row, col + 5, datetime.today(),date_format)
+        worksheet.write(row, col + 5, datetime.today(), date_format)
         worksheet.write(row, col + 6, effort)
         worksheet.write(row, col + 7, complexity)
         worksheet.write(row, col + 8, AMorAD)
@@ -81,15 +82,15 @@ for ticket in tickets:
         worksheet.write(row, col + 10, project)
         row += 1
 
-worksheet.write(row+1, col+6, f'=SUM(G3:G{l})')
+worksheet.write(row + 1, col + 6, f'=SUM(G3:G{l})')
 
-while True:
-    try:
+while True :
+    try :
         workbook.close()
-    except xlsxwriter.exceptions.FileCreateError as e:
+    except xlsxwriter.exceptions.FileCreateError as e :
         decision = input("Exception caught in workbook.close(): %s\n"
                          "Please close the file if it is open in Excel.\n"
                          "Try to write file again? Type [n]: " % e)
-        if decision != 'n':
+        if decision != 'n' :
             continue
     break
