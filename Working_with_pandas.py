@@ -1,27 +1,31 @@
 # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_sql_query.html#pandas.read_sql_query
 
+# creator : RITA
+
+# import all required packages
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import PatternFill
 from datetime import datetime, timedelta
 import pandas as pd
 import os
 
-
-# month, year, date & datetime format
 month = datetime.today().month
 year = datetime.today().year
 _date = str(datetime.today()).split()[0]
-dt = str((datetime.now()-timedelta(days = 0)).strftime("%Y-%m-%d %H:%M:%S"))
+dt = str((datetime.now() - timedelta(days=0)).strftime("%Y-%m-%d %H:%M:%S"))
 _file_name = f'Efforts_{month}_{year}.xlsx'
 _sheet_name = f'Data_{_date}'
 _ticket_file = 'Data.xlsx'
 _row = 0
 
 
+# create New Workbook if Workbook doesn't exists
 def new_workbook(_file_name):
-    wb = Workbook()
-    ws = wb.active
-    ws.title = _sheet_name
+    wb = Workbook()  # Workbook Object
+    ws = wb.active  # Gets the active worksheet
+    ws.title = _sheet_name  # Name the active worksheet
+
+    # Writing the header columns
     ws['A1'] = 'Ticket No'
     ws['B1'] = 'Ref No'
     ws['C1'] = 'Corp ID'
@@ -34,36 +38,43 @@ def new_workbook(_file_name):
     ws['J1'] = 'SOW'
     ws['K1'] = 'Project'
 
-    col_range = ws.max_column
+    col_range = ws.max_column  # get max coulns in the worksheet
 
-    for col in range(1, col_range + 1) :
+    # formatting the header columns, filling the color
+    for col in range(1, col_range + 1):
         cell_header = ws.cell(1, col)
         cell_header.fill = PatternFill(start_color='e6f738', end_color='e6f738', fill_type="solid")
 
-    wb.save(_file_name)
-    wb.close()
+    wb.save(_file_name)  # save the workbook
+    wb.close()  # close the workbook
 
 
 def read_data_excel():
+    # Checks if the file is present?
     if os.path.exists(_ticket_file):
-        tickets = pd.read_excel(_ticket_file, usecols= 'A')
-        tickets_list = ['','0']
+        tickets = pd.read_excel(_ticket_file, usecols='A')  # Read the file with excel file
+        tickets_list = ['', '0']  # List with some default values
+
+        # Appending the cell value in the list
         for i in tickets['Ticket']:
             tickets_list.append(str(i).strip())
+
         return tickets_list
     else:
-        wb = Workbook()
-        ws = wb.active
-        ws['A1'] = 'Ticket'
-        ws.cell(1,1).fill = PatternFill(start_color='e6f738', end_color='e6f738', fill_type="solid")
+        wb = Workbook()  # Workbook object
+        ws = wb.active  # Get Active Worksheet
+        ws['A1'] = 'Ticket'  # Giving Header Name
+
+        # Formatting the Header
+        ws.cell(1, 1).fill = PatternFill(start_color='e6f738', end_color='e6f738', fill_type="solid")
+
         wb.save(_ticket_file)
         wb.close()
 
 
 def create_list(_row):
-    # l = len(tickets)-1
-    corp_id = 'rikushwa'
-    project = 'TOPSI'
+    corp_id = 'user_name'
+    project = 'project_name'
     complexity = 'Medium'
     activity_type = ''
     activity = ''
@@ -73,34 +84,33 @@ def create_list(_row):
     SOW = ''
     my_tickets_record = []
 
-    tickets = read_data_excel()
-    if tickets is None :
+    tickets = read_data_excel()  # Read Excel
+
+    if tickets is None:
         print(f'No records in {_ticket_file}, fill in records and try again.')
     else:
-        _rows = len(tickets)+1
-        for ticket in tickets :
-            if ticket == '' :
+        _rows = len(tickets) + 1
+
+        for ticket in tickets:
+            if ticket == '':
                 activity_type = 'Meetings / Communication'
                 activity = 'Mail Communication'
                 effort = 1.5
-            elif ticket == '0' :
+            elif ticket == '0':
                 activity_type = 'Service-Task'
                 activity = 'DSTUM'
                 effort = 1.5
-            elif ticket[:3] == 'CHG' :
+            elif ticket[:3] == 'CHG':
                 activity_type = 'Change Request'
                 activity = 'Third party coordination'
                 effort = 1
-            else :
+            else:
                 activity_type = 'Incident'
                 activity = 'Incident'
                 effort = 0.75
 
-            ticket_details = (
-                [ticket, reference, corp_id, activity_type, activity, dt, effort, complexity, AMorAD, SOW, project],)
-            for tickets, reference, corp_id, activity_type, activity, date, effort, complexity, AMorAD, SOW, project in ticket_details :
-                my_tickets_record.append(
-                    [ticket, reference, corp_id, activity_type, activity, dt, effort, complexity, AMorAD, SOW, project])
+            my_tickets_record.append([ticket, reference, corp_id, activity_type, activity, dt, effort, complexity, AMorAD, SOW, project])
+
         my_tickets_record.append([f'=SUM(G{_row}:G{_row + _rows})'])
         return my_tickets_record
 
@@ -111,7 +121,7 @@ def write_existing_wb(_file_name):
     _max_rows = existing_ws.max_row
     records = create_list(_max_rows)
     if records is not None:
-        for row in create_list(_max_rows) :
+        for row in create_list(_max_rows):
             existing_ws.append(row)
         existing_wb.save(_file_name)
         existing_wb.close()
