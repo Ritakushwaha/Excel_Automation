@@ -11,15 +11,11 @@ import os
 month = datetime.today().month
 year = datetime.today().year
 _date = str(datetime.today()).split()[0]
-# _minus_days = int(input("Enter days to minus from current date"))
-
 dt = str((datetime.now()-timedelta(days = 20)).strftime("%Y-%m-%d %H:%M:%S"))
-
-
-# Excel Workbook, worksheet names
 _file_name = f'Efforts_{month}_{year}.xlsx'
 _sheet_name = f'Data_{_date}'
 _ticket_file = 'Data.xlsx'
+_row = 0
 
 
 def new_workbook(_file_name):
@@ -40,21 +36,36 @@ def new_workbook(_file_name):
     ws['K1'] = 'Project'
 
     col_range = ws.max_column
+
     for col in range(1, col_range + 1) :
         cell_header = ws.cell(1, col)
         cell_header.fill = PatternFill(start_color='e6f738', end_color='e6f738', fill_type="solid")
 
     wb.save(_file_name)
+    wb.close()
 
 
-def read_data_excel(_ticket_file) :
-    print("read_data_excel() : called")
-    tickets = pd.read_excel(_ticket_file, index_col=0,usecols='A')
-    return tickets
+def read_data_excel():
+    try:
+        if os.path.exists(_ticket_file):
+            tickets = pd.read_excel(_ticket_file, usecols= 'A')
+            tickets_list = ['','0']
+            for i in tickets['Ticket']:
+                tickets_list.append(str(i).strip())
+            return tickets_list
+        else:
+            raise FileNotFoundError("File not found")
+    except FileNotFoundError as err:
+        print(f'File not present\nCreated a excel file with {_ticket_file} name, fill in detail and try again',err)
+        wb = Workbook()
+        ws = wb.active
+        ws['A1'] = 'Ticket'
+        ws.cell(1,1).fill = PatternFill(start_color='e6f738', end_color='e6f738', fill_type="solid")
+        wb.save(_ticket_file)
+        wb.close()
 
 
-def create_list() :
-    print("create_list() : called")
+def create_list(_row):
     # l = len(tickets)-1
     corp_id = 'rikushwa'
     project = 'TOPSI'
@@ -67,10 +78,10 @@ def create_list() :
     SOW = ''
     my_tickets_record = []
 
-    tickets = read_data_excel(_ticket_file)
+    tickets = read_data_excel()
+    _rows = len(tickets)+1
 
     for ticket in tickets :
-        print("ticket: ", ticket)
         if ticket == '' :
             activity_type = 'Meetings / Communication'
             activity = 'Mail Communication'
@@ -90,25 +101,30 @@ def create_list() :
 
         ticket_details = (
             [ticket, reference, corp_id, activity_type, activity, dt, effort, complexity, AMorAD, SOW, project],)
-        print("ticket_details in create_list() : \n", ticket_details)
         for tickets, reference, corp_id, activity_type, activity, date, effort, complexity, AMorAD, SOW, project in ticket_details :
             my_tickets_record.append(
                 [ticket, reference, corp_id, activity_type, activity, dt, effort, complexity, AMorAD, SOW, project])
-
+    my_tickets_record.append([f'=SUM(G{_row}:G{_row + _rows})'])
     return my_tickets_record
+
+
+def write_existing_wb(_file_name):
+    existing_wb = load_workbook(_file_name)
+    existing_ws = existing_wb.active
+    _max_rows = existing_ws.max_row
+    for row in create_list(_max_rows) :
+        existing_ws.append(row)
+    existing_wb.save(_file_name)
+    existing_wb.close()
 
 
 try:
     if os.path.exists(_file_name) :
-        existing_wb = load_workbook(_file_name)
-        existing_ws = existing_wb.active
-        print("max row ",existing_ws.max_row)
-        for row in create_list() :
-            existing_ws.append(row)
-        existing_wb.save(_file_name)
-        existing_wb.close()
-    else :
+        write_existing_wb(_file_name)
+    else:
         raise FileNotFoundError("File not found")
 except FileNotFoundError as err:
     new_workbook(_file_name)
+    write_existing_wb(_file_name)
+
 
