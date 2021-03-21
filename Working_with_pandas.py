@@ -19,7 +19,6 @@ _row = 0
 
 
 def new_workbook(_file_name):
-    print("new_workbook() : called")
     wb = Workbook()
     ws = wb.active
     ws.title = _sheet_name
@@ -46,17 +45,13 @@ def new_workbook(_file_name):
 
 
 def read_data_excel():
-    try:
-        if os.path.exists(_ticket_file):
-            tickets = pd.read_excel(_ticket_file, usecols= 'A')
-            tickets_list = ['','0']
-            for i in tickets['Ticket']:
-                tickets_list.append(str(i).strip())
-            return tickets_list
-        else:
-            raise FileNotFoundError("File not found")
-    except FileNotFoundError as err:
-        print(f'File not present\nCreated a excel file with {_ticket_file} name, fill in detail and try again',err)
+    if os.path.exists(_ticket_file):
+        tickets = pd.read_excel(_ticket_file, usecols= 'A')
+        tickets_list = ['','0']
+        for i in tickets['Ticket']:
+            tickets_list.append(str(i).strip())
+        return tickets_list
+    else:
         wb = Workbook()
         ws = wb.active
         ws['A1'] = 'Ticket'
@@ -79,52 +74,51 @@ def create_list(_row):
     my_tickets_record = []
 
     tickets = read_data_excel()
-    _rows = len(tickets)+1
+    if tickets is None :
+        print(f'No records in {_ticket_file}, fill in records and try again.')
+    else:
+        _rows = len(tickets)+1
+        for ticket in tickets :
+            if ticket == '' :
+                activity_type = 'Meetings / Communication'
+                activity = 'Mail Communication'
+                effort = 1.5
+            elif ticket == '0' :
+                activity_type = 'Service-Task'
+                activity = 'DSTUM'
+                effort = 1.5
+            elif ticket[:3] == 'CHG' :
+                activity_type = 'Change Request'
+                activity = 'Third party coordination'
+                effort = 1
+            else :
+                activity_type = 'Incident'
+                activity = 'Incident'
+                effort = 0.75
 
-    for ticket in tickets :
-        if ticket == '' :
-            activity_type = 'Meetings / Communication'
-            activity = 'Mail Communication'
-            effort = 1.5
-        elif ticket == '0' :
-            activity_type = 'Service-Task'
-            activity = 'DSTUM'
-            effort = 1.5
-        elif ticket[:3] == 'CHG' :
-            activity_type = 'Change Request'
-            activity = 'Third party coordination'
-            effort = 1
-        else :
-            activity_type = 'Incident'
-            activity = 'Incident'
-            effort = 0.75
-
-        ticket_details = (
-            [ticket, reference, corp_id, activity_type, activity, dt, effort, complexity, AMorAD, SOW, project],)
-        for tickets, reference, corp_id, activity_type, activity, date, effort, complexity, AMorAD, SOW, project in ticket_details :
-            my_tickets_record.append(
-                [ticket, reference, corp_id, activity_type, activity, dt, effort, complexity, AMorAD, SOW, project])
-    my_tickets_record.append([f'=SUM(G{_row}:G{_row + _rows})'])
-    return my_tickets_record
+            ticket_details = (
+                [ticket, reference, corp_id, activity_type, activity, dt, effort, complexity, AMorAD, SOW, project],)
+            for tickets, reference, corp_id, activity_type, activity, date, effort, complexity, AMorAD, SOW, project in ticket_details :
+                my_tickets_record.append(
+                    [ticket, reference, corp_id, activity_type, activity, dt, effort, complexity, AMorAD, SOW, project])
+        my_tickets_record.append([f'=SUM(G{_row}:G{_row + _rows})'])
+        return my_tickets_record
 
 
 def write_existing_wb(_file_name):
     existing_wb = load_workbook(_file_name)
     existing_ws = existing_wb.active
     _max_rows = existing_ws.max_row
-    for row in create_list(_max_rows) :
-        existing_ws.append(row)
-    existing_wb.save(_file_name)
-    existing_wb.close()
+    records = create_list(_max_rows)
+    if records is not None:
+        for row in create_list(_max_rows) :
+            existing_ws.append(row)
+        existing_wb.save(_file_name)
+        existing_wb.close()
 
 
-try:
-    if os.path.exists(_file_name) :
-        write_existing_wb(_file_name)
-    else:
-        raise FileNotFoundError("File not found")
-except FileNotFoundError as err:
+if os.path.exists(_file_name):
+    write_existing_wb(_file_name)
+else:
     new_workbook(_file_name)
     write_existing_wb(_file_name)
-
-
