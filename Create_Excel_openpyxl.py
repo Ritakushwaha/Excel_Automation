@@ -74,6 +74,5 @@ for ticket in tickets:
         my_dic.append([ticket, reference, corp_id, activity_type, activity, dt, effort, complexity, AMorAD, SOW, project])
 
 ws.append(my_dic)
-
 wb.save(filename)
 

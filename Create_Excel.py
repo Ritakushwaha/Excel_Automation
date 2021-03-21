@@ -8,7 +8,7 @@ month = datetime.today().month
 year = datetime.today().year
 dt = str(datetime.today() - timedelta(days=1)).split()[0]
 
-workbook = xlsxwriter.Workbook(f'Efforts_{dt}.xlsx')
+workbook = xlsxwriter.Workbook(f'Efforts_{month}_{year}.xlsx')
 worksheet = workbook.add_worksheet(f'Data_{dt}.xlsx')
 
 # Add a bold format to use to highlight cells.
