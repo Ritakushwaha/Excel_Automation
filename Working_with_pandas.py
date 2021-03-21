@@ -11,7 +11,7 @@ import os
 month = datetime.today().month
 year = datetime.today().year
 _date = str(datetime.today()).split()[0]
-dt = str((datetime.now()-timedelta(days = 20)).strftime("%Y-%m-%d %H:%M:%S"))
+dt = str((datetime.now()-timedelta(days = 0)).strftime("%Y-%m-%d %H:%M:%S"))
 _file_name = f'Efforts_{month}_{year}.xlsx'
 _sheet_name = f'Data_{_date}'
 _ticket_file = 'Data.xlsx'
