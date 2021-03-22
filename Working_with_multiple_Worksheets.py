@@ -85,17 +85,11 @@ def create_worksheets(wb):
 
 
 def write_data(name, wb):
-    if name == _sheet_name1:
         cust_data = read_customer_data()
         cust_df = pd.DataFrame(cust_data)
-        writer = ExcelWriter(_file_name)
-        cust_df.to_excel(writer, sheet_name=name, index=False)
-        wb.save(_file_name)
-    if name == _sheet_name2:
-        prod_data = read_product_data()
-        prod_df = pd.DataFrame(prod_data)
-        writer = ExcelWriter(_file_name)
-        prod_df.to_excel(writer, sheet_name=name, index=False)
+        print(cust_df)
+        with ExcelWriter(_file_name) as writer :
+            cust_df.to_excel(writer)
         wb.save(_file_name)
 
 
