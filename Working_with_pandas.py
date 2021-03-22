@@ -3,8 +3,7 @@
 # creator : RITA
 
 # import all required packages
-from openpyxl import Workbook, load_workbook
-from openpyxl.styles import PatternFill
+
 from datetime import datetime, timedelta
 import pandas as pd
 import os

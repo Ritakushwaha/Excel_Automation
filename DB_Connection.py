@@ -13,7 +13,7 @@ class MyDB:
             # creation of database if not exists
             mycursor.execute("CREATE DATABASE IF NOT EXISTS test_db")
             # connection to database
-            conn = mysql.connector.connect(host="localhost", user="root", password="viraj200321",database='gym_manager')
+            conn = mysql.connector.connect(host="localhost", user="root", password="viraj200321",database='test_db')
             return conn
         except Error as err :
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR :
