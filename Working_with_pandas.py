@@ -3,7 +3,8 @@
 # creator : RITA
 
 # import all required packages
-
+from openpyxl import Workbook, load_workbook
+from openpyxl.styles import PatternFill
 from datetime import datetime, timedelta
 import pandas as pd
 import os
@@ -120,7 +121,7 @@ def write_existing_wb(_file_name):
     _max_rows = existing_ws.max_row
     records = create_list(_max_rows)
     if records is not None:
-        for row in create_list(_max_rows):
+        for row in records:
             existing_ws.append(row)
         existing_wb.save(_file_name)
         existing_wb.close()

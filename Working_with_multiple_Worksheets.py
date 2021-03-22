@@ -16,11 +16,13 @@ mydb = MyDB()
 _file_name = 'Multiple_worksheets.xlsx'
 _sheet_name1 = 'Customer_1'
 _sheet_name2 = 'Product_2'
-_row = 0
 
 
 def read_customer_data():
     try:
+        name = []
+        age = []
+        cust_dic = {}
         conn = mydb.get_connection()
         sql_select_Query = "select * from Customer"
         cursor = conn.cursor()
@@ -28,25 +30,29 @@ def read_customer_data():
         records = cursor.fetchall()
         total = 0
         for row in records :
-            print(row[0],row[1])
-            total += 1
-        print(f'Total rows in Customer Table is {total}')
+            name.append(row[0])
+            age.append(row[1])
+        cust_dic.update({'Name' : name, 'Age' : age})
+        return cust_dic
     except Error as e:
         print("Error reading data from MySQL table", e)
 
 
 def read_product_data():
     try:
+        name = []
+        price = []
+        prod_dic = {}
         conn = mydb.get_connection()
         sql_select_Query = "select * from Product"
         cursor = conn.cursor()
         cursor.execute(sql_select_Query)
         records = cursor.fetchall()
-        total = 0
         for row in records:
-            print(row[0],row[1])
-            total += 1
-        print(f'Total rows in Customer Table is {total}')
+            name.append(row[0])
+            price.append(row[1])
+        prod_dic.update({'Name': name, 'Price':price})
+        return prod_dic
     except Error as e:
         print("Error reading data from MySQL table", e)
 
@@ -63,23 +69,37 @@ def create_worksheets(wb):
     print('create_worksheets')
     for name in wb.sheetnames:
         if name == _sheet_name1:
-            print(f'{_sheet_name1} is present')
+            write_data(name)
         else:
-            print(f'{_sheet_name1} is not present')
-            ws1 = wb.create_sheet(_sheet_name1)
+            wb.create_sheet(_sheet_name1, 0)
+            write_data(name)
             wb.save(_file_name)
-        if name == _sheet_name2:
-            print(f'{_sheet_name2} is present')
+        if name == _sheet_name2 :
+            write_data(name)
         else:
-            print(f'{_sheet_name2} is not present')
-            ws2 = wb.create_sheet(_sheet_name2)
+            wb.create_sheet(_sheet_name2, 1)
+            write_data(name)
             wb.save(_file_name)
+
+
+def write_data(name):
+    if name == _sheet_name1:
+        cust_data = read_customer_data()
+        cust_df = pd.DataFrame(cust_data)
+        print(cust_df)
+        cust_df.to_excel(_file_name, name, index=False)
+    if name == _sheet_name2:
+        prod_data = read_product_data()
+        prod_df = pd.DataFrame(prod_data)
+        print(prod_df)
+        prod_df.to_excel(_file_name, name, index=False)
 
 
 if os.path.exists(_file_name):
     wb = load_workbook(_file_name)
-    # read_customer_data()
-    # read_product_data()
+    write_data(_sheet_name1)
+    write_data(_sheet_name2)
 else:
     new_workbook(_file_name)
+
 
