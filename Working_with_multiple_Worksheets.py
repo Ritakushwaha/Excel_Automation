@@ -9,6 +9,9 @@ from openpyxl.styles import PatternFill
 from datetime import datetime, timedelta
 import pandas as pd
 import os
+from pandas import ExcelWriter
+
+
 from DB_Connection import MyDB
 
 mydb = MyDB()
@@ -61,7 +64,8 @@ def new_workbook(_file_name):
     print('new_workbook()')
     wb = Workbook()  # Workbook Object
     create_worksheets(wb)
-    wb.save(_file_name)  # save the workbook
+    write_data(_sheet_name1, wb)
+    write_data(_sheet_name2, wb)
     wb.close()  # close the workbook
 
 
@@ -69,36 +73,36 @@ def create_worksheets(wb):
     print('create_worksheets')
     for name in wb.sheetnames:
         if name == _sheet_name1:
-            write_data(name)
+            write_data(name,wb)
         else:
             wb.create_sheet(_sheet_name1, 0)
-            write_data(name)
-            wb.save(_file_name)
+            write_data(name, wb)
         if name == _sheet_name2 :
             write_data(name)
         else:
             wb.create_sheet(_sheet_name2, 1)
-            write_data(name)
-            wb.save(_file_name)
+            write_data(name, wb)
 
 
-def write_data(name):
+def write_data(name, wb):
     if name == _sheet_name1:
         cust_data = read_customer_data()
         cust_df = pd.DataFrame(cust_data)
-        print(cust_df)
-        cust_df.to_excel(_file_name, name, index=False)
+        writer = ExcelWriter(_file_name)
+        cust_df.to_excel(writer, sheet_name=name, index=False)
+        wb.save(_file_name)
     if name == _sheet_name2:
         prod_data = read_product_data()
         prod_df = pd.DataFrame(prod_data)
-        print(prod_df)
-        prod_df.to_excel(_file_name, name, index=False)
+        writer = ExcelWriter(_file_name)
+        prod_df.to_excel(writer, sheet_name=name, index=False)
+        wb.save(_file_name)
 
 
 if os.path.exists(_file_name):
     wb = load_workbook(_file_name)
-    write_data(_sheet_name1)
-    write_data(_sheet_name2)
+    write_data(_sheet_name1,wb)
+    write_data(_sheet_name2,wb)
 else:
     new_workbook(_file_name)
 
