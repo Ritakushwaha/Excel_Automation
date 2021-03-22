@@ -10,15 +10,11 @@ from datetime import datetime, timedelta
 import pandas as pd
 import os
 from pandas import ExcelWriter
-
-
 from DB_Connection import MyDB
 
 mydb = MyDB()
 
 _file_name = 'Multiple_worksheets.xlsx'
-_sheet_name1 = 'Customer_1'
-_sheet_name2 = 'Product_2'
 
 
 def read_customer_data():
@@ -60,44 +56,26 @@ def read_product_data():
         print("Error reading data from MySQL table", e)
 
 
-def new_workbook(_file_name):
-    print('new_workbook()')
-    wb = Workbook()  # Workbook Object
-    create_worksheets(wb)
-    write_data(_sheet_name1, wb)
-    write_data(_sheet_name2, wb)
-    wb.close()  # close the workbook
-
-
-def create_worksheets(wb):
-    print('create_worksheets')
-    for name in wb.sheetnames:
-        if name == _sheet_name1:
-            write_data(name,wb)
-        else:
-            wb.create_sheet(_sheet_name1, 0)
-            write_data(name, wb)
-        if name == _sheet_name2 :
-            write_data(name)
-        else:
-            wb.create_sheet(_sheet_name2, 1)
-            write_data(name, wb)
-
-
-def write_data(name, wb):
-        cust_data = read_customer_data()
-        cust_df = pd.DataFrame(cust_data)
-        print(cust_df)
-        with ExcelWriter(_file_name) as writer :
-            cust_df.to_excel(writer)
-        wb.save(_file_name)
+def write_data(wb):
+    _sheet_name1 = 'Customer_1'
+    _sheet_name2 = 'Product_2'
+    cust_data = read_customer_data()
+    cust_df = pd.DataFrame(cust_data)
+    prod_data = read_product_data()
+    prod_df = pd.DataFrame(prod_data)
+    with ExcelWriter(_file_name) as writer :
+        cust_df.to_excel(writer, sheet_name= _sheet_name1)
+        prod_df.to_excel(writer, sheet_name= _sheet_name2)
 
 
 if os.path.exists(_file_name):
     wb = load_workbook(_file_name)
-    write_data(_sheet_name1,wb)
-    write_data(_sheet_name2,wb)
+    write_data(wb)
 else:
-    new_workbook(_file_name)
+    print('new_workbook()')
+    wb = Workbook()
+    write_data(wb)
+
+
 
 
