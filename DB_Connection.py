@@ -8,12 +8,12 @@ class MyDB:
     def get_connection(self):
         try:
             #connection to MYSQL
-            conn = mysql.connector.connect(host="localhost",user="root",password="viraj200321")
+            conn = mysql.connector.connect(host="localhost",user="user",password="pass")
             mycursor = conn.cursor()
             # creation of database if not exists
             mycursor.execute("CREATE DATABASE IF NOT EXISTS test_db")
             # connection to database
-            conn = mysql.connector.connect(host="localhost", user="root", password="viraj200321",database='test_db')
+            conn = mysql.connector.connect(host="localhost", user="user", password="pass",database='test_db')
             return conn
         except Error as err :
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR :
