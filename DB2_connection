@@ -1,0 +1,20 @@
+import ibm_db
+import sys
+
+
+def get_connection():
+    db_name = 'db'
+    db_host_name = "host"
+    db_port = "port"
+    db_protocol = "protocol"
+    db_username = "user"
+    db_password = "pass"
+
+    try:
+        conn = ibm_db.connect(
+            f"DATABASE = {db_name}; HOSTNAME = {db_host_name}; PORT = {db_port}; PROTOCOL = {db_protocol}; UID = {db_username}; PWD = {db_password};",
+            "", "")
+        return conn
+    except:
+        print("no connection:", ibm_db.conn_errormsg())
+        sys.exit(1)
