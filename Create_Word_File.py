@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Mar 25 17:45:57 2021
+
+@author: rikushwa
+"""
+
 # import docx NOT python-docx
 from docx import Document
 from docx.table import _Cell
@@ -37,7 +44,7 @@ server_memory = ['g', 'i', 'r', 'u']
 doc = Document()
 
 # add a heading of level 0 (largest heading)
-doc.add_heading('Topsi TAVHAL MARTTI/MAHTI Capacity report for the week', 0)
+doc.add_heading('Capacity report for the week', 0)
 
 # add a paragraph and store
 # the object in a variable
@@ -45,8 +52,8 @@ doc_para = doc.add_paragraph()
 
 # add a run i.e, style like
 # bold, italic, underline, etc.
-doc_para.add_run('MARTTI CPU STATUS').bold = True
-doc_para.add_run('\nBelow is the current CPU utilization for MARTTI WAS Servers.')
+doc_para.add_run('CPU STATUS').bold = True
+doc_para.add_run('\nBelow is the current CPU utilization.')
 
 table1 = doc.add_table(rows, cols)
 table1.style = 'Table Grid'
@@ -72,8 +79,8 @@ for i in range(0, rows):
 
 doc_para1 = doc.add_paragraph()
 
-doc_para1.add_run('\n\nMARTTI MEMORY STATUS').bold = True
-doc_para1.add_run('\nThe WAS cluster memory utilization trend is as follows.')
+doc_para1.add_run('\n\nMEMORY STATUS').bold = True
+doc_para1.add_run('\nMemory utilization trend is as follows.')
 
 table2 = doc.add_table(rows, cols)
 table2.style = 'Table Grid'
@@ -128,4 +135,4 @@ doc_para2.add_run('\n\nHey').bold = True
 doc_para2.add_run('\nListen')
 
 # now save the document to a location
-doc.save(f'test.docx')
+doc.save(f'test_word.docx')
