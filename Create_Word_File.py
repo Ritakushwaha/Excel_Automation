@@ -2,7 +2,7 @@
 """
 Created on Thu Mar 25 17:45:57 2021
 
-@author: rikushwa
+@author: Rita
 """
 
 # import docx NOT python-docx
