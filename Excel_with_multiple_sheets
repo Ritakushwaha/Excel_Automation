@@ -1,0 +1,314 @@
+import ibm_db
+from openpyxl import Workbook, load_workbook
+from openpyxl.styles import PatternFill
+from datetime import datetime, timedelta
+import os
+from DB2_connection import get_connection
+from Send_Email import send_mail
+
+
+_date = str(datetime.today()).split()[0]
+_file_name = f'TAVHAL_Martti_Capacity_Check_development_{_date}.xlsx'
+_sheet1 = 'Orderrows per day'
+_sheet2 = 'Orderrows per hour'
+_sheet3 = 'MRP  rivit tunneittain'
+_sheet4 = 'Stock'
+_sheet5 = 'Date pairs'
+_sheet6 = 'Orderclass'
+_sheet7 = 'Toimitusaineistojen käsittely'
+_sheet8 = 'Automatic receiving of orders'
+_sheet9 = 'Delivery handling'
+
+
+# formats header filling color
+def format_columns(ws):
+    col_range = ws.max_column  # get max coulmns in the worksheet
+    # formatting the header columns, filling the color
+    for col in range(1, col_range + 1):
+        cell_header = ws.cell(1, col)
+        cell_header.fill = PatternFill(start_color='e6f738', end_color='e6f738', fill_type="solid")
+
+
+# writes data in the worksheets
+def write_data(_file_name):
+    wb = load_workbook(_file_name)  # load existing workbook
+    # writing in every worksheet present in workbook
+    for sheet in wb.sheetnames:
+        if sheet == _sheet1:
+            ws = wb[sheet]
+            order_rows_per_day_lst = order_rows_per_day()
+            for rows in order_rows_per_day_lst:
+                ws.append(rows)
+            wb.save(_file_name)
+            print(f'{sheet} updated')
+        elif sheet == _sheet2:
+            ws = wb[sheet]
+            order_rows_per_hour_lst = order_rows_per_hour()
+            for rows in order_rows_per_hour_lst:
+                ws.append(rows)
+            wb.save(_file_name)
+            print(f'{sheet} updated')
+        elif sheet == _sheet3:
+            ws = wb[sheet]
+            mrp_rows_per_hour_lst = mrp_rows_per_hour()
+            for rows in mrp_rows_per_hour_lst:
+                ws.append(rows)
+            wb.save(_file_name)
+            print(f'{sheet} updated')
+        elif sheet == _sheet4:
+            ws = wb[sheet]
+            stock_list = stock()
+            ws.append(stock_list)
+            wb.save(_file_name)
+            print(f'{sheet} updated')
+        elif sheet == _sheet5:
+            ws = wb[sheet]
+            date_pair_list = stock()
+            ws.append(date_pair_list)
+            wb.save(_file_name)
+            print(f'{sheet} updated')
+        elif sheet == _sheet6:
+            ws = wb[sheet]
+            order_class_list = orderclass()
+            ws.append(order_class_list)
+            wb.save(_file_name)
+            print(f'{sheet} updated')
+        elif sheet == _sheet7:
+            ws = wb[sheet]
+            delivery_material_lst = processing_of_delivery_materials()
+            for row in delivery_material_lst:
+                ws.append(row)
+            wb.save(_file_name)
+            print(f'{sheet} updated')
+        elif sheet == _sheet8:
+            ws = wb[sheet]
+            automatic_order_lst = automatic_receiving_of_orders()
+            for row in automatic_order_lst:
+                ws.append(row)
+            wb.save(_file_name)
+            print(f'{sheet} updated')
+        elif sheet == _sheet9:
+            ws = wb[sheet]
+            delivery_handling_lst = delivery_handling()
+            for row in delivery_handling_lst:
+                ws.append(row)
+            wb.save(_file_name)
+            print(f'{sheet} updated')
+        else:
+            print("Done")
+
+
+# create new workbook if the worksheet not present
+def create_workbook(_file_name):
+    wb = Workbook()  # Workbook Object
+    a = 'A1'
+    b = 'B1'
+    c = 'C1'
+    
+    ws1 = wb.create_sheet(_sheet1, index=0)  
+    ws1[a] = 'TIME'
+    ws1[b] = 'TILAUSLAHDE'
+    ws1[c] = 'ORDEROWS'
+    format_columns(ws1)
+
+    ws2 = wb.create_sheet(_sheet2, index=1)  
+    ws2[a] = 'HOUR'
+    ws2[b] = 'ORDEROWS'
+    format_columns(ws2)
+
+    ws3 = wb.create_sheet(_sheet3, index=2)
+    ws3[a] = 'HOUR'
+    ws3[b] = 'ORDEROWS'
+    format_columns(ws3)
+
+    ws4 = wb.create_sheet(_sheet4, index=3)
+    ws4[a] = 'DATE'
+    ws4[b] = 'SALDOPLACES'
+    format_columns(ws4)
+
+    ws5 = wb.create_sheet(_sheet5, index=4)
+    ws5[a] = 'DATE'
+    ws5[b] = 'DATEPAIRROWS'
+    format_columns(ws5)
+
+    ws6 = wb.create_sheet(_sheet6, index=5)
+    ws6[a] = 'DATE'
+    ws6[b] = 'ORDERCLASS'
+    format_columns(ws6)
+
+    ws7 = wb.create_sheet(_sheet7, index=6)
+    ws7[a] = 'DATE'
+    ws7[b] = 'ROWS'
+    format_columns(ws7)
+
+    ws8 = wb.create_sheet(_sheet8, index=7)
+    ws8[a] = '1'
+    ws8[b] = '2'
+    format_columns(ws8)
+
+    ws9 = wb.create_sheet(_sheet9, index=8)
+    ws9[a] = '1'
+    ws9[b] = '2'
+    ws9[c] = '3'
+    format_columns(ws9)
+
+    wb.save(_file_name)
+    wb.close()
+
+
+def topsi_tavhal_excel():
+    if os.path.exists(_file_name):
+        print(f'{_file_name} exists')
+        write_data(_file_name) # write data
+        send_mail(_file_name) # send mail
+    else:
+        print(f'{_file_name} not exists\nCreating new {_file_name}')
+        create_workbook(_file_name)  # create workbook
+        write_data(_file_name) # write data
+
+
+# order rows per day records fetching
+def order_rows_per_day():
+    conn = get_connection()
+    sql = '''select query'''
+    stmt = ibm_db.exec_immediate(conn, sql)
+    dictionary = ibm_db.fetch_both(stmt)
+    order_rows_per_day_list = []
+    while dictionary:
+        order_rows_per_day_list.append([dictionary["TIME"], dictionary["TILAUSLAHDE"], dictionary["ORDERROWS"]])
+        dictionary = ibm_db.fetch_both(stmt)
+    return order_rows_per_day_list  # returns multiple rows list
+
+
+# order rows per hour records fetching
+def order_rows_per_hour():
+    conn = get_connection()
+    sql = '''SELECT query'''
+    stmt = ibm_db.exec_immediate(conn, sql)
+    dictionary = ibm_db.fetch_both(stmt)
+    order_rows_per_hour_list = []
+    while dictionary:
+        order_rows_per_hour_list.append([dictionary["HOUR"], dictionary["ORDERROWS"]])
+        dictionary = ibm_db.fetch_both(stmt)
+    return order_rows_per_hour_list  # returns multiple rows list
+
+
+# mrp rows per hour records fetching
+def mrp_rows_per_hour():
+    conn = get_connection()
+    sql = '''SELECT query'''
+    stmt = ibm_db.exec_immediate(conn, sql)
+    dictionary = ibm_db.fetch_both(stmt)
+    mrp_rows_per_hour_list = []
+    while dictionary:
+        mrp_rows_per_hour_list.append([dictionary["HOUR"], dictionary["ORDERROWS"]])
+        dictionary = ibm_db.fetch_both(stmt)
+    return mrp_rows_per_hour_list  # returns multiple rows list
+
+
+# stock records fetching
+def stock():
+    conn = get_connection()
+    sql = '''SELECT query'''
+    stmt = ibm_db.exec_immediate(conn, sql)
+    dictionary = ibm_db.fetch_both(stmt)
+    stock_list = []
+    while dictionary:
+        stock_list = [dictionary["DATE"], dictionary["SALDOPLACES"]]
+        dictionary = ibm_db.fetch_both(stmt)
+    return stock_list  # returns one row list
+
+
+# date pair record fetching
+def date_pairs():
+    conn = get_connection()
+    sql1 = '''SELECT query'''
+
+    sql2 = '''SELECT query;'''
+
+    stmt = ibm_db.exec_immediate(conn, sql1)
+    dictionary = ibm_db.fetch_both(stmt)
+    
+    if dictionary["DATEPAIRROWS"] == 0:
+        stmt = ibm_db.exec_immediate(conn, sql2)
+        dictionary = ibm_db.fetch_both(stmt)
+        date_pair_list = []
+        while dictionary:
+            date_pair_list = [dictionary["DATE"], dictionary["DATEPAIRROWS"]]
+            dictionary = ibm_db.fetch_both(stmt)
+        return date_pair_list
+    else:
+        date_pair_list = []
+        while dictionary:
+            date_pair_list = [dictionary["DATE"], dictionary["DATEPAIRROWS"]]
+            dictionary = ibm_db.fetch_both(stmt)
+        return date_pair_list  # returns single row list
+
+
+# orderclass record fetching
+def orderclass():
+    conn = get_connection()
+    sql1 = '''SELECT query'''
+
+    sql2 = '''SELECT query'''
+
+    stmt = ibm_db.exec_immediate(conn, sql1)
+    dictionary = ibm_db.fetch_both(stmt)
+
+    if dictionary["ORDERCLASS"] == 0:
+        stmt = ibm_db.exec_immediate(conn, sql2)
+        dictionary = ibm_db.fetch_both(stmt)
+        order_class_list = []
+        while dictionary:
+            order_class_list = [dictionary["DATE"], dictionary["ORDERCLASS"]]
+            dictionary = ibm_db.fetch_both(stmt)
+        return order_class_list
+    else:
+        order_class_list = []
+        while dictionary:
+            order_class_list = [dictionary["DATE"], dictionary["ORDERCLASS"]]
+            dictionary = ibm_db.fetch_both(stmt)
+        return order_class_list  # returns single row list
+
+
+# processing_of_delivery_materials records fetching
+def processing_of_delivery_materials():
+    conn = get_connection()
+    sql = '''SELECT query'''
+    stmt = ibm_db.exec_immediate(conn, sql)
+    dictionary = ibm_db.fetch_both(stmt)
+    delivery_material_list = []
+    while dictionary:
+        delivery_material_list.append([str(dictionary["DATE"]), dictionary["ROWS"]])
+        dictionary = ibm_db.fetch_both(stmt)
+    return delivery_material_list  # returns multiple rows list
+
+
+# automatic receiving of orders records fetching
+def automatic_receiving_of_orders():
+    conn = get_connection()
+    sql = '''SELECT query'''
+    stmt = ibm_db.exec_immediate(conn, sql)
+    dictionary = ibm_db.fetch_both(stmt)
+    automatic_order_list = []
+    while dictionary:
+        automatic_order_list.append([str(dictionary["1"]), dictionary["2"]])
+        dictionary = ibm_db.fetch_both(stmt)
+    return automatic_order_list  # returns multiple rows list
+
+
+# delivery handling records fetching
+def delivery_handling():
+    conn = get_connection()
+    sql = '''SELECT query'''
+    stmt = ibm_db.exec_immediate(conn, sql)
+    dictionary = ibm_db.fetch_both(stmt)
+    delivery_handling_list = []
+    while dictionary:
+        delivery_handling_list.append([dictionary["1"], dictionary["2"], dictionary["3"]])
+        dictionary = ibm_db.fetch_both(stmt)
+    return delivery_handling_list # returns multiple rows list
+
+
+if __name__ == '__main__':
+    topsi_tavhal_excel()
