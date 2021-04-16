@@ -9,15 +9,15 @@ from Send_Email import send_mail
 
 _date = str(datetime.today()).split()[0]
 _file_name = f'TAVHAL_Martti_Capacity_Check_development_{_date}.xlsx'
-_sheet1 = 'Orderrows per day'
-_sheet2 = 'Orderrows per hour'
-_sheet3 = 'MRP  rivit tunneittain'
-_sheet4 = 'Stock'
-_sheet5 = 'Date pairs'
-_sheet6 = 'Orderclass'
-_sheet7 = 'Toimitusaineistojen käsittely'
-_sheet8 = 'Automatic receiving of orders'
-_sheet9 = 'Delivery handling'
+_sheet1 = 'Sheet1'
+_sheet2 = 'Sheet2'
+_sheet3 = 'Sheet3'
+_sheet4 = 'Sheet4'
+_sheet5 = 'Sheet5'
+_sheet6 = 'Sheet6'
+_sheet7 = 'Sheet7'
+_sheet8 = 'Sheet8'
+_sheet9 = 'Sheet9'
 
 
 # formats header filling color
