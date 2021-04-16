@@ -1,4 +1,5 @@
 #pip install pyWin32 package
+#https://pbpython.com/windows-com.html
 
 import win32com.client
 import os
@@ -25,16 +26,18 @@ messages = messages.Restrict("[ReceivedTime] >= '"+received_dt+"'")
 #save to current directory
 outputDir = os.getcwd()
 
-
 try:
     for message in list(messages):
-        try:
-            s = message.sender
-            for attachment in message.Attachments:
-              attachment.SaveASFile(os.path.join(outputDir, attachment.FileName))
-            print(f"attachment {attachment.FileName} from {s} saved")
-            return attachment.FileName
-        except Exception as e:
-            print("error when saving the attachment:" + str(e))
+        if email_subject in message.subject and message.SenderEmailAddress == email_sender and message.ReceivedTime.strftime('%Y-%m-%d') == _date:
+            try:
+                s = message.sender
+                for attachment in message.Attachments:
+                  attachment.SaveASFile(os.path.join(outputDir, attachment.FileName))
+                print(f"Attachment: {attachment.FileName} From: {s} Received on: {message.ReceivedTime.strftime('%Y-%m-%d')} is saved\n")
+                return attachment.FileName
+            except Exception as e:
+                print("error when saving the attachment:" + str(e))
+        else:
+            print("Else part",message.subject, message.ReceivedTime.strftime('%Y-%m-%d'))
 except Exception as e:
     print("error when processing emails messages:" + str(e))
