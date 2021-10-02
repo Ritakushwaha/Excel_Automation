@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<data>
+    
+<!--details for Db2 connection-->
+    <add key="db_name" value="dbname" />
+    <add key="db_host_name" value="ip" />
+    <add key="db_port" value="port" />
+    <add key="db_protocol" value="TCPIP" />
+    <add key="db_username" value="uid" />
+    <add key="db_password" value="pass" />
+    
+</data>
