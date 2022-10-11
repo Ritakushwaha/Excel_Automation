@@ -31,7 +31,7 @@ tickets = ['', '0', 'CHG0000000', 'CHG1111111', 'SCT1232121', 'INC1121212', 'SCT
            'INC1212122', 'INC121212']
 
 l = len(tickets) - 1
-corp_id = 'rikushwa'
+corp_id = 'corpid'
 project = 'TOPSI'
 complexity = 'Medium'
 activity_type = ''

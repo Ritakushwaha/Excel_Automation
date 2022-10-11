@@ -12,6 +12,4 @@ print(prod_df)
 with ExcelWriter(_file_name) as writer :
     prod_df.to_excel(writer, sheet_name='Love')
     prod_df.to_excel(writer, sheet_name='Hate')
-    
-    
     #myexample oteam

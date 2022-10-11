@@ -75,7 +75,7 @@ def read_data_excel():
 
 
 def create_list(_row):
-    corp_id = 'rikushwa'
+    corp_id = 'corpid'
     project = 'TOPSI'
     complexity = 'Medium'
     activity_type = ''

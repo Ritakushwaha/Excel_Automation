@@ -2,10 +2,10 @@
 <data>
     
 <!--details for sending Mail-->
-    <add key="fromaddr" value="rita.kushwaha@domain.com" />
-    <add key="toaddr" value="pragya.a.jain@domain.com,sowjanya.marpine@domain.com,prachi.a.yadav@domain.com" />
-    <add key="subject_line_r15" value="Morning Routine | R15 | " />
-    <add key="body_r15" value="Hi,&#10;Here is the R15 Excel&#10;Best Regards,&#10;Rita Kushwaha" />
+    <add key="fromaddr" value="from@domain.com" />
+    <add key="toaddr" value="to@domain.com,to1@domain.com,to2@domain.com" />
+    <add key="subject_line_r15" value="Your Subject" />
+    <add key="body_r15" value="Hi,&#10;Here is the Example Excel&#10;Best Regards,&#10;Rita Kushwaha" />
     <add key="subject_line_balance_check" value="Checking Validity of New Daily Balance Process" />
-    <add key="toaddr_balance_check" value="prachi.a.yadav@domain.com,yogesh.c.upadhyay@domain.com" />
+    <add key="toaddr_balance_check" value="to3@domain.com,to4@domain.com" />
 </data>
