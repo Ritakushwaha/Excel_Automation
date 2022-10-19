@@ -1,3 +1,5 @@
+## Install package pywin32 to acces your Outlook Application
+
 import win32com.client
 import os
 from datetime import datetime, timedelta
@@ -12,7 +14,7 @@ inbox = mapi.GetDefaultFolder(6) #Inbox folder
 inbox = inbox.Folders["your folder"] #Folder inside Inbox Folder
 messages = inbox.Items 
 received_dt = datetime.now() - timedelta(days=1)
-received_dt = received_dt.strftime('%m/%d/%Y %H:%M %p')
+received_dt = received_dt.strftime('%m/%d/%Y') 
 email_sender = 'sender@outlook.com'
 email_subject = 'Subject of mail'
 messages = messages.Restrict("[ReceivedTime] >= '"+received_dt+"'")
@@ -22,7 +24,7 @@ outputDir = os.getcwd()
 
 try:
   for message in list(messages):
-    if email_subject == message.subject and message.SenderEmailAddress == email_sender and message.ReceivedTime.strftime('%Y-%m-%d') == _date:
+    if email_subject == message.subject and message.SenderEmailAddress == email_sender and message.ReceivedTime.strftime('%m/%d/%Y') >= received_dt:
       try:
         s = message.sender
         for attachment in message.Attachments:
